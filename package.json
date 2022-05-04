@@ -1,0 +1,26 @@
+{
+  "name": "nutritionlistjs",
+  "version": "1.0.0",
+  "description": "nutricion list - js vanilla",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thiagobardini/nutritionListJS.git"
+  },
+  "author": "Thiago Bardini",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thiagobardini/nutritionListJS/issues"
+  },
+  "homepage": "https://github.com/thiagobardini/nutritionListJS#readme",
+  "dependencies": {
+    "chart.js": "^3.7.1",
+    "snackbar": "^1.1.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.5.0"
+  }
+}
