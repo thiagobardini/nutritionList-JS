@@ -5,7 +5,7 @@ import AppData from './app-data.js'
 import 'chart.js'
 
 const API = new FetchWrapper(
-  'https://firestore.googleapis.com/v1/projects/jsdemo-3f387/databases/(default)/documents/thiagoHello'
+  'https://firestore.googleapis.com/v1/projects/jsdemo-3f387/databases/(default)/documents/thiagobardini1234'
 )
 
 const appData = new AppData()
@@ -19,7 +19,6 @@ const fat = document.querySelector('#create-fat')
 
 const displayEntry = (name, carbs, protein, fat) => {
   appData.addFood(carbs, protein, fat)
-  console.log(name)
   list.insertAdjacentHTML(
     'beforeend',
     `<li class="card">
@@ -61,7 +60,7 @@ form.addEventListener('submit', (event) => {
     snackbar.show('Food added successfully.')
 
     displayEntry(name.value, carbs.value, protein.value, fat.value)
-    renderChart()
+    render()
 
     name.value = ''
     carbs.value = ''
@@ -70,29 +69,28 @@ form.addEventListener('submit', (event) => {
   })
 })
 
-const init = async () => {
-  const data = await API.get('/?pageSize=30')
+const init = () => {
+  API.get('/?pageSize=100').then((data) => {
+    data.documents?.forEach((doc) => {
+      const fields = doc.fields
 
-  data.documents?.forEach((doc) => {
-    const fields = doc.fields
-
-    displayEntry(
-      fields.name.stringValue,
-      fields.carbs.integerValue,
-      fields.protein.integerValue,
-      fields.fat.integerValue
-    )
+      displayEntry(
+        fields.name.stringValue,
+        fields.carbs.integerValue,
+        fields.protein.integerValue,
+        fields.fat.integerValue
+      )
+    })
+    render()
   })
-  renderChart()
 }
 
-let myChart = null
+let chartInstance = null
 const renderChart = () => {
-  myChart?.destroy()
-
+  chartInstance?.destroy()
   const context = document.querySelector('#app-chart').getContext('2d')
 
-  myChart = new Chart(context, {
+  chartInstance = new Chart(context, {
     type: 'bar',
     data: {
       labels: ['Carbs', 'Protein', 'Fat'],
@@ -104,7 +102,6 @@ const renderChart = () => {
             appData.getTotalProtein(),
             appData.getTotalFat(),
           ],
-          // data: [10, 4, 5],
           backgroundColor: ['#25AEEE', '#FECD52', '#57D269'],
           borderWidth: 3, // example of other customization
         },
@@ -122,7 +119,18 @@ const renderChart = () => {
       },
     },
   })
-  return myChart
+}
+
+const totalCalories = document.querySelector('#total-calories')
+
+const updateTotalCalories = () => {
+  totalCalories.textContent = appData.getTotalCalories()
+}
+
+const render = () => {
+  renderChart()
+  updateTotalCalories()
 }
 
 init()
+renderChart()

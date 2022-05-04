@@ -535,7 +535,7 @@ var _snackbarDefault = parcelHelpers.interopDefault(_snackbar);
 var _appDataJs = require("./app-data.js");
 var _appDataJsDefault = parcelHelpers.interopDefault(_appDataJs);
 var _chartJs = require("chart.js");
-const API = new _fetchWrapperJsDefault.default('https://firestore.googleapis.com/v1/projects/jsdemo-3f387/databases/(default)/documents/thiagoHello');
+const API = new _fetchWrapperJsDefault.default('https://firestore.googleapis.com/v1/projects/jsdemo-3f387/databases/(default)/documents/thiagobardini1234');
 const appData = new _appDataJsDefault.default();
 const list = document.querySelector('#food-list');
 const form = document.querySelector('#create-form');
@@ -545,7 +545,6 @@ const protein = document.querySelector('#create-protein');
 const fat = document.querySelector('#create-fat');
 const displayEntry = (name1, carbs1, protein1, fat1)=>{
     appData.addFood(carbs1, protein1, fat1);
-    console.log(name1);
     list.insertAdjacentHTML('beforeend', `<li class="card">
         <div>
           <h3 class="name">${_helpersJs.capitalize(name1)}</h3>
@@ -584,26 +583,27 @@ form.addEventListener('submit', (event)=>{
         }
         _snackbarDefault.default.show('Food added successfully.');
         displayEntry(name.value, carbs.value, protein.value, fat.value);
-        renderChart();
+        render();
         name.value = '';
         carbs.value = '';
         protein.value = '';
         fat.value = '';
     });
 });
-const init = async ()=>{
-    const data = await API.get('/?pageSize=30');
-    data.documents?.forEach((doc)=>{
-        const fields = doc.fields;
-        displayEntry(fields.name.stringValue, fields.carbs.integerValue, fields.protein.integerValue, fields.fat.integerValue);
+const init = ()=>{
+    API.get('/?pageSize=100').then((data)=>{
+        data.documents?.forEach((doc)=>{
+            const fields = doc.fields;
+            displayEntry(fields.name.stringValue, fields.carbs.integerValue, fields.protein.integerValue, fields.fat.integerValue);
+        });
+        render();
     });
-    renderChart();
 };
-let myChart = null;
+let chartInstance = null;
 const renderChart = ()=>{
-    myChart?.destroy();
+    chartInstance?.destroy();
     const context = document.querySelector('#app-chart').getContext('2d');
-    myChart = new Chart(context, {
+    chartInstance = new Chart(context, {
         type: 'bar',
         data: {
             labels: [
@@ -619,7 +619,6 @@ const renderChart = ()=>{
                         appData.getTotalProtein(),
                         appData.getTotalFat(), 
                     ],
-                    // data: [10, 4, 5],
                     backgroundColor: [
                         '#25AEEE',
                         '#FECD52',
@@ -641,11 +640,19 @@ const renderChart = ()=>{
             }
         }
     });
-    return myChart;
+};
+const totalCalories = document.querySelector('#total-calories');
+const updateTotalCalories = ()=>{
+    totalCalories.textContent = appData.getTotalCalories();
+};
+const render = ()=>{
+    renderChart();
+    updateTotalCalories();
 };
 init();
+renderChart();
 
-},{"./fetch-wrapper.js":"5hTQM","./helpers.js":"ecN5O","snackbar":"nwWOh","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./app-data.js":"lWRJn","chart.js":"khwgE"}],"5hTQM":[function(require,module,exports) {
+},{"./fetch-wrapper.js":"5hTQM","./helpers.js":"ecN5O","snackbar":"nwWOh","./app-data.js":"lWRJn","chart.js":"khwgE","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5hTQM":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 class FetchWrapper {
@@ -837,6 +844,9 @@ class AppData {
         return this.food.reduce((total, current)=>{
             return total + current.fat;
         }, 0);
+    }
+    getTotalCalories() {
+        return this.getTotalCarbs() * 4 + this.getTotalProtein() * 4 + this.getTotalFat() * 9;
     }
 }
 exports.default = AppData;
